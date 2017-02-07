@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - vue实例</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		
+	</div>
+
+</body>
+<script>
+	var data={a:1};
+	var vm = new Vue({
+		el:'#app',
+		//选项
+		data:data,
+		created:function(){//生命周期钩子-vm被创建之后调用
+			//this->vue实例
+			console.log('a is '+ this.a);
+		}
+	})
+	//扩展vue构造器-》组件构造器
+	var myComponent = Vue.extend({
+		//扩展选项
+	})
+	var myComponentInstance = new myComponent();
+
+	console.log(vm.a===data.a);//代理data
+
+	//vm暴露属性和方法等
+	console.log(vm.$data===data)
+	console.log(vm.$el === document.getElementById('app'))
+	vm.$watch('a',function(newV,oldV){
+		//...不要在实例属性或callback中用箭头函数，this问题
+	})
+
+</script>
+</html>
