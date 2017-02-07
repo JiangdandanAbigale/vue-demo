@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 模板语法</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+	    <!-- 插值-文本 -->
+		<p>Message:{{msg}}</p>
+		<!-- v-once内容不再更新 -->
+		<p v-once>我不再发生改变了:{{msg}}</p>
+		<!-- 插值-纯html -->
+		<p v-html="rawHtml">hahha我可能消失呀！也许会xss攻击</p>
+		<!-- 插值-属性 -->
+		<p v-bind:id='dynamicId'>我的id可以任意变化</p>
+		<!-- 插值-js表达式 : 只能包含单个表达式-->
+		<p>{{a+1}}</p>
+		<!-- 指令-参数 -->
+		<p><a v-bind:href='url'>百度链接</a></p>
+		<!-- 指令-修饰符 -->
+		<p>
+			<!-- 触发事件时调用event.preventDefault() -->
+			<form v-on:submit.prevent="onSubmit"></form>
+		</p>
+		<!-- 过滤器 - for常见的文本格式化;复杂的用计算属性-->
+		<p>{{msg1|capitalize}}</p>
+		<!-- <p v-bind:id="rawId|formatId">格式化的id</p> -->
+		<!-- 缩写 -->
+		<!-- 
+			v-bind:href->:href
+			v-on:click->@click
+		 -->
+	</div>
+
+</body>
+<script>
+	var vm = new Vue({
+		el:'#app',
+		data:{
+			msg:'哈喽，我是一条信息！',
+			rawHtml:'<strong>我是纯html</strong>',
+			dynamicId:'idididi',
+			a:0,
+			url:'http://www.baidu.com',
+			msg1:'hello'
+		},
+		methods:{
+			onSubmit(){
+				//....
+			}
+		},
+		filters: {
+    		capitalize: function (value) {
+		      if (!value) return ''
+		      value = value.toString()
+		      return value.charAt(0).toUpperCase() + value.slice(1)
+		    }
+  		}
+	})
+</script>
+</html>
