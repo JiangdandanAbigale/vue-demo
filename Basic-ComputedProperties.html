@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 计算属性</title>
+</head>
+<script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+<script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+
+<script src="js/vue.js"></script>
+
+<body>
+	<div id="app">
+		<!-- 复杂逻辑，模板过重难以维护 -->
+		<p>{{ message.split('').reverse().join('') }}</p>
+	<!-- 计算属性 -->
+		<!-- 基础栗子 -->
+		<p>Original message:{{message}}</p>
+		<p>UpperCase message:{{upperMessage}}</p>
+		<!-- 计算缓存vs Methods -->
+        <p>通过方法实现：{{upperMethod()}}</p>
+        <!-- 
+			计算属性是基于它的以来缓存，即message不变，多次访问upperMessage不必再次执行函数
+			而每当重新渲染时，method调用总会执行函数
+         -->
+         <!-- 计算属性vs Watched property -->
+         <p>{{ fullName }}</p>
+         <!-- [Vue warn]: existing instance property "fullName" will be overwritten by a computed property with the same name.  -->
+<!-- (found in root instance) -->
+
+		<!-- 计算setter-->
+		<hr>
+   <!-- 观察 :当你想要在数据变化响应时，执行异步操作或开销较大的操作，这是很有用的。-->
+	   <!-- 栗子 -->
+	   <div style='background: #ccc'>
+	   		enter a yes/no question:<input type="text" v-model="question">
+	   		<p>{{answer}}</p>
+	   </div>
+	</div>
+
+</body>
+<script>
+	var vm = new Vue({
+		el:'#app',
+		data:{
+			message:'Hello Vue!',
+			seen:true,
+			todos:[{txt:'hah'},{txt:'hhe'}],
+			firstName:'DanDan',
+			lastName:'Jiang',
+			// fullName:'Dandan Jiang',
+			question:'',
+			answer:'等待你的输入....'
+		},
+		computed:{
+			upperMessage(){ //计算属性upperMessage的getter函数
+				return this.message.toUpperCase();
+			},
+			fullName:{
+				get(){
+					return this.firstName+'--'+this.lastName;
+				},
+				// 计算set
+				set(newV){
+					var names = newV.split('--')
+				    this.firstName = names[0]
+				    this.lastName = names[names.length - 1]
+				}
+				
+			}
+		},
+		methods:{
+			upperMethod(){
+				return this.message.toUpperCase();
+			},
+			getAnswer:_.debounce(
+
+// 在这个示例中，使用 watch 选项允许我们执行异步操作（访问一个 API），限制我们执行该操作的频率，并在我们得到最终结果前，设置中间状态。这是计算属性无法做到的。
+			      function () {
+			        var vm = this
+			        if (this.question.indexOf('?') === -1) {
+			          vm.answer = '没有问号'
+			          return;
+			        }
+			        vm.answer = '想想想'
+			        //promise对象
+			        axios.get('https://yesno.wtf/api')
+			          .then(function (response) {
+			            vm.answer = _.capitalize(response.data.answer)
+			          })
+			          .catch(function (error) {
+			            vm.answer = 'Error! Could not reach the API. ' + error
+			          })
+			      },
+	      // 这是我们为用户停止输入等待的毫秒数
+	      500
+	    )
+		},
+		//和计算属性有冲突，先注释掉了
+		// watch:{
+		// 	firstName(val){
+		// 		this.fullName = val + ' '+ this.lastName;
+		// 	},
+		// 	lastName(val){
+		// 		this.fullName = this.firstName+ ' '+ val;
+		// 	}
+		// }
+		watch:{
+			question(val){
+				this.answer = '等待中。。。';
+				this.getAnswer();
+			}
+		}
+	})
+	console.log(vm.upperMessage)
+	vm.message='i can decide upperMessage';
+	console.log(vm.upperMessage);
+</script>
+</html>
