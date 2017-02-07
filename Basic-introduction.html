@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 介绍</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		{{message}}
+		<span v-bind:title="message">hah</span>
+		<p v-if="seen">你看到我啦！</p>
+		<ol>
+			<li v-for="todo in todos">{{todo.txt}}</li>
+		</ol>
+		<button v-on:click="reverseMsg">翻转文本</button>
+		<input type="text" v-model="message">
+		<hr>
+		<ol>
+			<todo-item v-for="todo in todos" v-bind:todo="todo"></todo-item>
+		</ol>
+	</div>
+
+</body>
+<script>
+	Vue.component('todo-item',{
+		props:['todo'],
+		template:'<li>{{todo.txt}}</li>'
+	})
+	var app = new Vue({
+		el:'#app',
+		data:{
+			message:'Hello Vue!',
+			seen:true,
+			todos:[{txt:'hah'},{txt:'hhe'}],
+		},
+		methods:{
+			reverseMsg(){
+				this.message = this.message.split('').reverse().join('');
+			}
+		}
+	})
+</script>
+</html>
