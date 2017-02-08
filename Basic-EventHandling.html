@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 事件处理器</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<h1>监听事件</h1>
+		<p>v-on监听dom事件触发js</p>
+		<button @click="count+=1">加1</button>
+		<p>点击了{{count}}次</p>
+		<hr>
+		<h1>方法事件处理器</h1>
+		<p>v-on可接受一个定义的方法来调用</p>
+		<button @click="greet">Greet</button>
+		<hr>
+		<h1>内联处理器方法</h1>
+		<p>可用内联js语句</p>
+		<button @click='say("hi")'>say hi</button>
+		<!-- 访问原生dom事件，可传入$event -->
+		<button @click='warn("未找到",$event)'>原生</button>
+		<hr>
+		<h1>事件修饰符</h1>
+		<p>methods只纯粹的数据逻辑，而不是去处理dom细节eg:event.preventDefault();提供以下后缀修饰符</p>
+		<a @click.stop='greet'>阻止单击事件冒泡</a>
+		<form @submit.prevent="greet">提交事件不再重载页面</form>
+		<a @click.stop.prevent="greet">修饰符可串联</a>
+		<form @submit.prevent>只有修饰符</form>
+		<p @click.capture='greet'>使用事件捕获模式</p>
+		<p @click.self="greet">事件在该元素本身触发时调用</p>
+        <p @click.once="greet">触发一次，新增，还能用在组件上</p>
+		<hr>
+		<h1>按键修饰符</h1>
+		<input type="text" @keyup.enter="greet">
+		<input type="text" @keyup.13="greet">
+		<!-- 其他：.tab,.delete,.esc,.space,.up,.down,.left,.right -->
+
+		<h1>新增按键修饰符</h1>
+		<!-- .ctrl,.alt,.shift,.meta -->
+		<!-- alt+c -->
+		<input type="text" @keyup.alt.97="greet">
+			</div>
+
+</body>
+<script>
+	var app = new Vue({
+		el:'#app',
+		data:{
+			count:0,
+		},
+		methods:{
+			greet(event){
+				alert('hello vuejs');
+				alert(event.target.tagName);
+			},
+			say(msg){
+				alert(msg);
+			},
+			warn(msg,event){
+				console.log(event);
+				console.log(msg);
+			}
+		}
+	})
+	//app.greet();也可以
+	Vue.config.keyCodes.f1=112;//自定义按键别名
+
+</script>
+</html>
