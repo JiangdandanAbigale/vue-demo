@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 表单控件绑定</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<h1>基础用法</h1>
+		<!-- v-model:在表单控件元素上创建双向数据绑定且会根据控件类型选取正确的方法来更新元素。负责监听用户的输入时间以更新数据，并处理些极端的例子。不关心控件初始值，会选择vue实例数据来做具体值 -->
+		<!-- 文本 -->
+		<input type="text" v-model="message" placeholder="edit me">
+		<p>Message is : {{message}}</p>
+		<!-- 多行文本 -->
+		<textarea name="" id="" cols="30" rows="10" v-model="message1"></textarea>
+		<!-- 在文本区域插值( <textarea></textarea> ) 并不会生效，应用 v-model 来代替 -->
+		<p style="white-space: pre;">{{message1}}</p>
+
+		<!-- 复选框 -->
+		<label for="chb">{{checked}}</label>
+		<input type="checkbox" v-model="checked" id="chb">
+		<!-- 多个勾选框绑定在一个数组 -->
+		<div style="background: #f5f5f5;">
+			<input type="checkbox" id="jack" value="jack" v-model="checkNames">
+			<label for="jack">jack</label>
+			<input type="checkbox" id="Mike" value="Mike" v-model="checkNames">
+			<label for="jack">Mike</label>
+			<input type="checkbox" id="john" value="john" v-model="checkNames">
+			<label for="jack">john</label>
+			<span>Checked Names:{{checkNames}}</span>
+		</div>
+		<!-- 单选按钮 -->
+		<input type="radio" id="one" value="one" v-model="picked">
+		<label for="one">one</label>
+		<input type="radio" id="two" value="two" v-model="picked">
+		<label for="two">two</label>
+		<p>被选中：{{picked}}</p>
+		<!-- 单选列表 -->
+		<select name="" id="" v-model="selected">
+			<option value="a">a</option>
+			<option value="b">b</option>
+			<option value="c">c</option>
+		</select>
+		<span>选择了{{selected}}</span>
+		<!-- 多选列表-绑定一个数组 -->
+		<select name="" id="" v-model="selecteds" multiple>
+			<option value="a">a</option>
+			<option value="b">b</option>
+			<option value="c">c</option>
+		</select>
+		<span>选择了{{selecteds}}</span>
+		<!-- 动态选项v-for -->
+		<select name="" id="" v-model="slectedDy">
+			<option v-for="option in opts" :value="option.value" >{{option.text}}</option>
+		</select>
+		<span>选择了{{slectedDy}}</span>
+		<hr>
+		<h1>绑定value</h1>
+		<!-- 对于单选按钮，勾选框及选择列表选项， v-model 绑定的 value 通常是静态字符串（对于勾选框是逻辑值）： -->
+		<!-- 但是有时我们想绑定 value 到 Vue 实例的一个动态属性上，这时可以用 v-bind 实现，并且这个属性的值可以不是字符串。 -->
+		<!-- 复选框 -->
+		<input type="checkbox" v-model="toggle" :true-value='a' :false-value='b'>
+		<!-- 单选按钮 -->
+		<input type="radio" v-model="pick" :value='a'>
+		<!-- 选择列表设置 -->
+		<select name="" id="" v-model='selected3'>
+			<option :value='a'>hahha</option>
+		</select>
+		<p>{{selected3}}</p>
+
+		<h1>修饰符</h1>
+		<!-- 在 "change" 而不是 "input" 事件中更新 -->
+		<input type="text" v-model.lazy="msg">
+		<p>{{msg}}</p>
+		<!-- 想自动将用户的输入值转为 Number 类型（如果原值的转换结果为 NaN 则返回原值 -->
+		<input v-model.number="age" type="number"><!--type="number"返回的是字符串-->
+		<p>{{age+1}}</p>
+		<!-- 自动过滤首尾空格 -->
+		<input type="text" v-model.trim='txt'>
+		<p>{{txt}}</p>
+
+		<h1>v-model 与 组件</h1>
+		<!-- Vue 的组件系统允许你创建一个具有自定义行为可复用的 input 类型，这些 input 类型甚至可以和 v-model 一起使用！要了解更多， -->
+	</div>
+
+</body>
+<script>
+	var app = new Vue({
+		el:'#app',
+		data:{
+			message:'',
+			message1:'',
+			checked:false,
+			checkNames:[],
+			picked:'one',
+			selected:'',
+			selecteds:[],
+			slectedDy:'',
+			opts:[{value:'name',text:'abi'},{value:'age',text:'20'}],
+			toggle:false,
+			a:"被选中",
+			b:'未选中',
+			pick:'',
+			selected3:'',
+			msg:'',
+			age:0,
+			txt:'',
+		},
+		computed:{
+			
+		}	
+	})
+	// 当选中时
+// app.toggle === app.a
+// 当没有选中时
+// app.toggle === app.b
+
+//被选中时
+//app.pick === app.a
+
+</script>
+</html>
