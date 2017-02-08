@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - class和style绑定</title>
+	<style>
+		.active{
+			color:red;
+		}
+		.text-danger{
+			background: green;
+		}
+		.comClass{
+			font-size:26px;
+		}
+
+	</style>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+	<!--在 v-bind 用于 class 和 style 时， Vue.js 专门增强了它。表达式的结果类型除了字符串之外，还可以是对象或数组。
+	-->
+	<!-- 绑定HTML Class - 对象语法 : text-danger一定要引以来-->
+		<p class="static" :class="{active:isActive}">绑定html class - 对象语法</p>
+		<p :class="{active:isActive,'text-danger':hasError}">绑定html class - 对象语法</p>
+		<p :class="classObj">hehheehh</p>
+		<!-- 这里还可以绑定对象的计算属性 -->
+		<p :class="classObjCom">计算属性</p>
+	
+	<!-- 绑定HTML Class - 数组语法:可用三元表达式切换 -->
+		<p :class="[activeClass,errClass]">用数组的class</p>
+		<p :class="[activeClass,hasError?errClass:'']">数组内含三元的class</p>
+		<p :class="[{active:isActive},hasError?errClass:'']">数组内含三元的class</p>
+	<!-- 绑定HTML Class - 用在组件上-->
+		<!-- 当你在一个定制的组件上用到 class 属性的时候，这些类将被添加到根元素上面，这个元素上已经存在的类不会被覆盖。	 -->
+		<my-c :class="classObj" class=""></my-c>
+
+		<hr>
+		<hr>
+
+	<!-- 绑定内联样式-对象语法 :同样的，对象语法常常结合返回对象的计算属性使用。-->
+		<p :style="{color:activeColor,fontSize:fontSize+'px'}">内联样式-对象语法</p>
+		<p :style="styleObj">内联样式-对象语法-better</p>
+
+	<!--绑定内敛样式 - 数组语法 -->
+
+		<p :style="[styleObj,styleObj1]">多个样式对象</p>
+	<!--绑定内敛样式 - 自动添加前缀 -->
+	<!-- 当 v-bind:style 使用需要特定前缀的 CSS 属性时，如 transform ，Vue.js 会自动侦测并添加相应的前缀。 -->
+	<p :style="styleObj1">自动添加前缀???</p>
+
+	</div>
+
+</body>
+<script>
+	Vue.component('my-c',{
+		template:'<p class="comClass">这是一个组件</p>'
+	})
+	var vm = new Vue({
+		el:'#app',
+		data:{
+			isActive:true,
+			hasError:false,
+			classObj: {
+			    active: false,
+			    'text-danger': true
+			},
+			activeClass:'active',
+			errClass:'text-danger',
+			activeColor:'yellow',
+			fontSize:20,
+			styleObj:{
+				color:'red',
+				fontSize:'10px',
+			},
+			styleObj1:{
+				background:'blue',
+				transform: 'rotate(-10deg)'
+			}
+		},
+		computed:{
+			classObjCom(){
+				return {
+					// ...
+				}
+			}
+		}
+	})
+	
+</script>
+</html>
