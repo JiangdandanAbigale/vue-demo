@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 列表渲染</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<h1>v-for</h1><!--根据数组的选项列表进行渲染-->
+		<h3>基本用法</h3>
+		<!-- v-for块中，对父作用域属性完全访问权 -->
+		<ul>
+			<li v-for="item in items">{{item.text}}</li>
+		</ul>
+		<!-- 第二个可选参数，当前项索引 -->
+		<ul>
+			<li v-for="(item,index) in items">{{index}}--{{item.text}}</li>
+			<!-- 不能{{index--item.text}}无效 -->
+		</ul>
+		<!-- 可用of代替in -->
+		<ul>
+			<li v-for="item of items">{{item.text}}</li>
+		</ul>
+
+		<h3>template v-for</h3>
+		<!-- 渲染多个元素快 -->
+		<ul>
+			<template v-for="item of items">
+				<li>{{item.text}}</li>
+				<li>我是分割线</li>
+			</template>
+		</ul>
+
+		<h3>对象迭代v-for</h3>
+		<!-- 按照Object.keys()遍历，不能保证不同js引擎下结果一样 -->
+		<ul>
+			<li v-for="value in Obj">{{value}}</li>
+		</ul>
+		<!-- 提供第二个参数为键名，第三个参数为索引 -->
+		<ul>
+			<li v-for="(value,key,index) in Obj">{{value}}=={{key}}=={{index}}</li>
+		</ul>
+
+		<h3>整数迭代v-for</h3>
+		<!-- 重复多次模板 -->
+		<ul>
+			<li v-for="n in 10">{{n}}</li>
+		</ul>
+
+		<h3>组件和v-for</h3>
+		<!-- 可以用v-for,但不能自动传递数据到组件。因组件有独立作用域，需要用props传递。 
+		不自动注入原因：会使得组件紧密耦合v-for。明确数据来源可使得组件复用 -->
+		<h4>一个小栗子：todolist</h4>
+		<input type="text" :placeholder="hint" v-model="newTodo" @keyup.enter="addNewTodo">
+		<!-- <ul>
+			<li v-for="todo in todolist">{{todo}}</li>
+		</ul>
+ -->	<ul>
+ 			<todo-item v-for="(todo,index) in todolist" :title="todo" @remove="todolist.splice(index, 1)"></todo-item>	
+ 		</ul>
+
+ 		<h1>key</h1>
+ 		<ul>
+ 		<!-- 建议尽可能使用 v-for 来提供 key ，除非迭代 DOM 内容足够简单，或者你是故意要依赖于默认行为来获得性能提升。 -->
+<!-- 因为它是 Vue 识别节点的一个通用机制， key 并不特别与 v-for 关联，key 还具有其他用途，我们将在后面的指南中看到其他用途。 -->
+ 			<li v-for="todo in todolist" :key="todo">{{todo}}</li>
+ 		</ul>
+
+ 		<h1>数据更新检测</h1>
+ 		<h3>变异方法</h3>
+ 		<p>vue包含一组观察数组的变异方法会触发视图更新：push(),pop(),shift(),unshift(),splice(),sort(),reverse()</p>
+ 		<h3>重塑数组</h3>
+ 		<p>非变异方法：filter(),concat(),slice()返回新数组，可用新数组替代旧数组，vue不会丢弃现有dom并重新渲染：用一个含相同元素的数组替换原来数组是很高效的操作</p>
+ 		<h3>注意事项</h3>
+ 		<p>vue不能检测以下变动的数组</p>
+ 		<ul>
+ 			<li v-for="todo in todolist">{{todo}}</li>
+ 		</ul>
+
+ 		<h1>显示过滤/排序结果</h1>
+ 		<p>只想显示一个数组的过滤或排序副本，并不改变实际数据时，可以创建返回该效果的计算属性</p>
+ 		<div>
+ 			<span v-for="num in evenNs">{{num}}</span>
+ 			<!-- 或者用method -->
+ 			<span v-for="num in even(nums)">{{num}}</span>
+ 		</div>
+
+ </div>
+
+</body>
+<script>
+    //将li写成组件形式
+    Vue.component('todo-item',{
+    	template:'\
+			    <li>\
+			      {{ title }}\
+			      <button v-on:click="$emit(\'remove\')">X</button>\
+			    </li>\
+			  ',    	
+  		props:['title'],
+    })
+	var app = new Vue({
+		el:'#app',
+		data:{
+			items:[
+				{text:'this is first line'},
+				{text:'this is second line'},				
+			],
+			Obj:{
+				firstName:'Dandan',
+				lastName:'Jiang',
+				age:'26'
+			},
+			hint:'Add a todo',
+			newTodo:'',
+			todolist:['playing','shopping'],
+			nums:[1,2,3,4,5,6,7,8,9]
+		},
+		methods:{
+			addNewTodo(){
+				if(this.newTodo=='')return;
+				this.todolist.push(this.newTodo);
+				this.newTodo='';
+			},
+			even(list){
+				return list.filter(function(val){
+					return val%2===0;
+				})
+			}
+		},
+		computed:{
+			evenNs(){
+				return this.nums.filter(function(val){
+					return val%2===0;
+				})
+			}
+		}
+	})
+	//vue不能检测以下数组变动
+	app.todolist[0]='watching';//无作用
+	// app.todolist.length=0;//无作用 - 放在这一行会导致下面的一行更新视图时起作用
+
+	Vue.set(app.todolist,0,'watching');
+	app.todolist.splice(1,1,'having fun');
+
+	app.todolist.splice(0);//更新长度到视图 但是若是取值大于原本的长度，不起任何作用
+
+</script>
+</html>
