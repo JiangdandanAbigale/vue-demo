@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 条件渲染</title>
+	<style>
+		
+	</style>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<h1>条件渲染</h1>
+		<ul>
+			<li>
+				<h2>v-if</h2>
+				<p v-if="ok">yes</p>
+				<p v-else>No</p><!-- v-else 元素必须紧跟在 v-if 元素或者 v-else-if的后面——否则它不能被识别。 -->
+				<!-- template中v-if条件组：切换多个元素 -->
+				<template v-if="ok1">
+					<p>hahha</p>
+					<p>hahhahha你能看到我啊</p>
+				</template>
+				<!-- v-else-if 新增 v-else-if 必须跟在 v-if 或者 v-else-if之后。-->
+				<p v-if="type==='A'">a</p>
+				<p v-else-if="type==='B'">b</p>
+				<p v-else>not a or b</p>
+				<!-- 使用key控制元素的可重用 -->
+				<h2>vue尽可能高效渲染元素，通常会复用元素而不是从头渲染：</h2>
+				<!-- 在代码中切换 loginType 不会删除用户已经输入的内容，两个模版由于使用了相同的元素，<input> 会被复用，仅仅是替换了他们的 placeholder。 -->
+				<template v-if="loginType==='username'">
+					<label for="">Username</label>
+					<input type="text" placeholder="enter your name">
+				</template>
+				<template v-else>
+					<label for="">Email</label>
+					<input type="text" placeholder="enter your email">
+				</template>
+				<button @click="toggleLoginType()">toggel login type</button>
+
+				<hr>
+				<h2>可决定是否复用：key关键字</h2>
+				<!-- 现在输入文本将会在每次切换时重新渲染,label不会，label没有key -->
+				<template v-if="loginType==='username'">
+					<label for="">Username</label>
+					<input type="text" placeholder="enter your name" key="user-input">
+				</template>
+				<template v-else>
+					<label for="">Email</label>
+					<input type="text" placeholder="enter your email" key="email-input">
+				</template>
+				<button @click="toggleLoginType()">toggel login type</button>
+
+
+			</li>
+			<li>
+				<h2>v-show</h2>
+				<p v-show='ok'>你可以看到我，我只是切换了display属性。注意：我不支持template</p>
+				<p v-show='ok1'>你看不到我了</p>
+			</li>
+			<li>
+				<h2>v-show vs v-if</h2>
+				<p>v-if:真实渲染，确保条件快在切换中适当销毁和重建内部事件监听和子组件；惰性的，若初次渲染条件为假，什么都不做。直到变为真才局部编译且被缓存；更高切换消耗，适合运行时条件不大变</p>
+				<p>v-show: 始终编译并保留，切换display属性。更高的初始渲染消耗；适合频繁切换</p>
+			</li>
+		</ul>
+
+	</div>
+
+</body>
+<script>
+	var vm = new Vue({
+		el:'#app',
+		data:{
+			ok:true,
+			ok1:false,
+			type:'B',
+			loginType:'username',			
+		},
+		methods:{
+			toggleLoginType(){
+				this.loginType=this.loginType==='username'?'':'username';
+			}
+		}
+	})
+	
+</script>
+</html>
