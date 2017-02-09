@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 组件</title>
+</head>
+<script src="js/vue.js"></script>
+<script src="js/currencyValidator.js"></script>
+<body>
+	<div id="app">
+		<h1>使用组件</h1>
+		<!-- 注册 -->
+		<my-compa></my-compa>
+		<!-- 局部注册 -->
+		<my-compb></my-compb>
+		<!-- Dom模板解析说明：有限制，需使用is属性 -->
+		<table>
+			<my-compa></my-compa>
+		</table><!--无效-->
+
+		<table>
+			<tr is="my-compa"></tr>
+		</table>
+		<!-- data必须是函数 -->
+		<!-- 使用组件时，大多数可以传入到 Vue 构造器中的选项可以在注册组件时使用，有一个例外： data 必须是函数。 -->
+		<div>
+		    共享一个data
+			<my-compc></my-compc>
+			<my-compc></my-compc>
+			<my-compc></my-compc>
+		</div>
+		<div>
+		    各自独立的data
+			<my-compd></my-compd>
+			<my-compd></my-compd>
+			<my-compd></my-compd>
+		</div>
+		<!-- 构成组件 -->
+		<!-- 父子组件的关系可以总结为 props down, events up 。父组件通过 props 向下传递数据给子组件，子组件通过 events 给父组件发送消息 -->
+		<h1>prop</h1>
+		<!-- 使用prop传递数据 -->
+		<my-compe message='父传递给子的信息'></my-compe>
+		<!-- camcelCase vs kebab-case -->
+		<!-- HTML 特性不区分大小写。当使用非字符串模版时，prop的名字形式会从 camelCase 转为 kebab-case（短横线隔开）： -->
+
+		<!-- 动态prop : 使用v-bind-->
+		<input type="text" v-model='parentMsg'>
+		<my-compe :message='parentMsg'></my-compe>
+		<!-- 字面量语法vs动态语法 -->
+		<p>传递的是字符串1</p>
+        <my-compe message='1'></my-compe>
+        <p>传递实际数字1</p>
+        <my-compe :message='1'></my-compe>
+		
+		<!-- 单向数据流 -->
+		<!-- 为了防止子组件无意间修改福组件 -->
+		<!-- 每次父组件更新，子组件所有prop都更新。所以子组件内部不应该修改prop -->
+		<!-- 可以修改的2中情况：1，作为初始值传入，子组件只将他做初始值使用；2.作为需要被转变的原始值传入 -->
+		<!-- 注意：若prop是数组或对象，会影响到父组件 -->
+		<!-- 例子1 -->
+		<my-compf :initalnum="initNum"></my-compf>
+		<!-- 例子2 -->
+		<my-compg :size='s'></my-compg>
+		
+		<hr>
+		<!-- prop验证 -->
+        
+        <h1>自定义事件： 子组件需要将数据传给父</h1>
+        <!-- v-on绑定自定义事件 -->
+        <!-- vue实例事件接口：$on(eventname) 监听；$emit(eventname)触发-->
+        <!-- 父组件可在使用子组件的地方直接用v-on监听子组件触发的事件 -->
+        <!-- 栗子 -->
+        <div>
+        	v-on绑定事件栗子
+        	<p>{{total}}</p>
+        	<my-comph @increment="incrementParent"></my-comph>
+        	<my-comph @increment="incrementParent"></my-comph>
+        	<my-comph @increment="incrementParent"></my-comph>
+    
+        </div>
+        <!-- 想给组件绑定原生事件 -->
+        <!-- <my-comph @click.native='xx'></my-comph> -->
+
+        <div>
+        	使用自定义事件的表单输入组件
+			<!-- 货币输入的小案例 -->
+			<compi v-model='price' @input="listenParent"></compi>
+
+			<p>一个相对完整的货币输入小案例</p>
+			<div style="border:2px solid red">
+				<compj label="Price" v-model="price"></compj>
+				<compj label="Shipping" v-model="shipping"></compj>
+				<compj label="Handling" v-model="handling"></compj>
+				<compj label="Discount" v-model="discount"></compj>
+				<p>Total:${{totalPrice}}</p>
+			</div>
+        </div>
+        <!-- 非父子间通信 -->
+
+
+	</div>
+
+</body>
+<script>
+	// 注册
+	var d = {num:0};
+	Vue.component('my-compa',{
+		template:'<div>我是第一个组件</div>'
+	})
+	//三个组件共享1个对象
+	Vue.component('my-compc',{
+		template:'<button @click="num+=1">{{num}}</button>',
+		data(){
+			return d;
+		}
+	})
+	//每个组件返回一个新对象
+	Vue.component('my-compd',{
+		template:'<button @click="num1+=1">{{num1}}</button>',
+		data(){
+			return {num1:0};
+		}
+	})
+    // 组件实例的作用域是孤立的。prop 是父组件用来传递数据的一个自定义属性。子组件需要显式地用 props 选项声明 “prop”：
+    Vue.component('my-compe',{
+    	props:['message'],
+    	template:'<div>{{message}}</div>'
+    })
+    //可改变prop的第一个例子
+    Vue.component('my-compf',{
+    	props:['initalnum'],
+    	data(){
+    	    return {num2:this.initalnum}
+    	},
+    	template:'<button @click="num2+=1">{{num2}}</button>',
+    })
+    //可改变prop的第二个例子
+    Vue.component('my-compg',{
+    	props:['size'],
+    	computed:{
+    		normarlizeSize(){
+    			return this.size.trim().toLowerCase();
+    		}
+    	},
+    	template:'<div>{{normarlizeSize}}</div>'
+    })
+
+    // prop验证
+    // 组件可以为 props 指定验证要求。如果未指定验证要求，Vue 会发出警告。当组件给其他人使用时这很有用。
+	// prop 是一个对象而不是字符串数组时，它包含验证要求：
+	//type:可以是原生构造器string/number/boolean/function/object/array或自定义构造器使用instanceof检测
+	Vue.component('example', {
+		  props: {
+		    // 基础类型检测 （`null` 意思是任何类型都可以）
+		    propA: Number,
+		    // 多种类型
+		    propB: [String, Number],
+		    // 必传且是字符串
+		    propC: {
+		      type: String,
+		      required: true
+		    },
+		    // 数字，有默认值
+		    propD: {
+		      type: Number,
+		      default: 100
+		    },
+		    // 数组／对象的默认值应当由一个工厂函数返回
+		    propE: {
+		      type: Object,
+		      default: function () {
+		        return { message: 'hello' }
+		      }
+		    },
+		    // 自定义验证函数
+		    propF: {
+		      validator: function (value) {
+		        return value > 10
+		      }
+		    }
+	  }
+	})
+
+	Vue.component('my-comph',{
+		props:[],
+		data(){
+			return {count:0};
+		},
+		template:'<button @click="increment">{{count}}</button>',
+		methods:{
+			increment(){
+				this.count++;
+				this.$emit('increment');
+			}
+		}
+
+	})
+	//表单组件
+	//原理：
+	// <input v-model='xx'>是语法糖，其实是<input :value='xx' @input='xx=$event.target.value'>
+	//在组件中使用v-model相当于<comp :value='xx' @input='xx=arguments[0]'></comp>
+	//因此，让组件的v-model生效必须：接受一个value属性和在有新的value时触发input事件
+
+	//货币输入小案例
+	Vue.component('compi',{
+		props:['value'],
+		template:'<span>$</sapn><input ref="priceInput" :value="value" @input="updatePrice($event.target.value)"></input>',
+		methods:{
+			updatePrice(price){
+				var formatPrice = price.trim().slice(0,price.indexOf('.')+3);//取2位小数和去掉首尾空格
+				if(formatPrice!==price){
+					this.$refs.priceInput.value = formatPrice;
+					
+				}
+				this.$emit('input',Number(formatPrice));
+			}
+		}
+	})
+
+	// 一个相对完整的货币输入小案例
+	Vue.component('compj',{
+		props:{
+			'label':{type:String,required:true},
+			'value':{type:Number,default:0},
+		},
+		template:'<div><label>{{label}} $</label><input :value="value" ref="input" @input="updatePrice($event.target.value)" @blur="formatPrice" @focus="selectAll"></div>',
+		mounted(){
+			this.formatPrice();
+		},		
+		methods:{
+			formatPrice(){
+				this.$refs.input.value = currencyValidator.format(this.value);
+			},
+			updatePrice(value){
+				var result = currencyValidator.parse(value,this.value);
+				if(result.warning){
+					this.$refs.input.value = result.value;
+				}
+				this.$emit('input',result.value);
+			},
+			selectAll(event){
+				setTimeout(function(){
+					event.target.select();
+				},0);
+			}
+		}		
+
+	})
+		var app = new Vue({
+		el:'#app',
+		data:{
+			parentMsg:'parentMsg from parent',
+			initNum:100,
+			s:' HelLO',
+			total:0,
+			price:0,
+			shipping:0,
+			handling:0,
+			discount:0,
+		},
+		// 局部注册-只在父模板可用
+		components:{
+			'my-compb':{template:'<div>我是第二个组件，局部注册组件</div>'}
+		},
+		computed:{
+			totalPrice(){
+				return (this.price+this.shipping+this.handling-this.discount).toFixed(2);
+			}
+		},
+		methods:{
+			incrementParent(){
+				this.total++;
+			},
+			listenParent(){
+				console.log(arguments)//可以接受子组件传递出来的东西
+				console.log('监听到了子组件的变化')
+			}
+		}
+	})
+	//非父子通信,复杂的话使用专门的状态管理模式
+	// 1.使用空的vue实例做中央事件总线；
+	// var bus = new Vue();
+	// //触发组件A中的事件
+	// bus.$emit('id-selected',1);
+	// //在组件b创建的钩子中监听事件
+	// bus.$on('id-selected',function(id){
+
+	// })
+
+</script>
+</html>

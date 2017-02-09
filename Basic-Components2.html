@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Basic - 组件</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<!-- 非父子组件通信测试 -->
+		<h1>非父子组件通信测试</h1>
+        <ca></ca>
+        
+		<cb></cb>
+	</div>
+
+</body>
+<script>
+// 空
+var bus = new Vue();
+
+Vue.component('ca',{
+	data(){
+		return {count:0};
+	},
+	template:'<button @click="clickNum">{{count}}</button>',
+	methods:{
+		clickNum(){
+			this.count++;
+			bus.$emit('clickNum',1)//触发
+		}
+	}
+})
+
+Vue.component('cb',{
+	created(){//接受
+		bus.$on('clickNum',function(n){
+			console.log(n)
+		})
+	},
+	template:'<p>监听</p>'
+})
+ 
+  var app = new Vue({
+  	el:'#app'
+  })
+ 
+</script>
+</html>
