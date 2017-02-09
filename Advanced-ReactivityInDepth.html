@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - 深入响应式原理</title>
+</head>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<!-- 响应式系统： 模型层model-普通js对象，修改它更新视图view -->
+		<!-- 如何追踪变化 -->
+		<!-- 变化检测问题 -->
+			<!-- vue无法检测对象属性的添加或删除：由于 Vue 会在初始化实例时对属性执行 getter/setter 转化过程，所以属性必须在 data 对象上存在才能让 Vue 转换它，这样才能让它是响应的。 -->
+		<p>响应的：{{a}}== 非响应的 b</p>
+		<p>使用Vue.set加入{{someObj.b}}</p>
+		<p>使用this.$set加入{{someObj.c}}</p>
+		<p>为已有对象添加属性{{someObj}}</p>
+
+		<!-- 声明响应式属性 -->
+		<!-- 异步更新队列-类似于setTimeout的执行顺序 ,避免操作dom
+			为了在数据变化之后等待 Vue 完成更新 DOM ，可以在数据变化之后立即使用 Vue.nextTick(callback) 。这样回调函数在 DOM 更新完成后就会调用。
+		-->
+		<p id="p1">{{message}}</p>
+
+
+	</div>
+
+</body>
+<script>
+	var app = new Vue({
+		el:'#app',
+		data:{
+			a:1,
+			someObj:{},//由于 Vue不允许动态添加根级响应式属性，所以你必须在初始化实例前声明根级响应式属性，哪怕只是一个空值:
+			message:'msg',
+		}
+	})
+	//vm.a是响应的
+	// app.b=2;//非响应
+
+	//Vue 不允许在已经创建的实例上动态添加新的根级响应式属性(root-level reactive property)。然而它可以使用 Vue.set(object, key, value) 方法将响应属性添加到嵌套的对象上：
+	Vue.set(app.someObj,'b',2);
+	//vue.set别名this.$set
+	app.$set(app.someObj,'c',3);
+	//想向已有对象添加一些属性
+	//代替Object.assign(this.someObj,{..})或者使用_.extend()
+	app.someObj = Object.assign({},this.someObj,{a:1,b:2,c:3,d:4,e:5});
+
+	app.message='new message';
+	console.log(document.getElementById('p1').textContent === app.message);
+	Vue.nextTick(function(){  //使用this.$nextTick()更方便
+		console.log(document.getElementById('p1').textContent === app.message)
+	})
+
+
+</script>
+</html>
