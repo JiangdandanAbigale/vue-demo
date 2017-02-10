@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - Render函数</title>
+</head>
+<style>
+	.redB{
+		margin-bottom:10px;
+		border:2px solid purple;
+	}
+</style>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<div class="redB">
+			<h2>基础</h2>
+			<!-- 推荐绝大多数使用template来创建html.但有的地方更需js的完全变成能力，这就要用render函数 -->
+			<!-- 栗子：动态生成标题 -->
+			<anchored-heading :level='1'>
+				自动创建了标题
+			</anchored-heading>
+			<!-- 在这种场景中使用 template 并不是最好的选择：首先代码冗长，为了在不同级别的标题中插入锚点元素，我们需要重复地使用 <slot></slot>。其次由于组件必须有根节点，标题和锚点元素被包裹在了一个无用的 div 中。 -->
+			<anchored-heading-render :level='3'>
+				通过render function生成
+			</anchored-heading-render>
+		</div>
+
+		<div class="redB">
+			<h2>createElment参数</h2>
+			<!-- / @returns {VNode}
+				createElement(
+				  // {String | Object | Function}
+				  // 一个 HTML 标签，组件选项，或一个函数
+				  // 必须 Return 上述其中一个
+				  'div',
+				  // {Object}
+				  // 一个对应属性的【数据对象】
+				  // 您可以在 template 中使用.可选项.
+				  {
+				    // (下一章，将详细说明相关细节)
+				  },
+				  // {String | Array}
+				  // 子节点(VNodes). 可选项.
+				  [
+				    createElement('h1', 'hello world'),
+				    createElement(MyComponent, {
+				      props: {
+				        someProp: 'foo'
+				      }
+				    }),
+				    'bar'
+				  ]
+				) -->
+				<!-- #完整数据对象 -->
+				<!-- 在 templates 中，v-bind:class 和 v-bind:style ，会有特别的处理，他们在 VNode 数据对象中，为最高级配置。 -->
+				<!-- 				{
+				  // 和`v-bind:class`一样的 API
+				  'class': {
+				    foo: true,
+				    bar: false
+				  },
+				  // 和`v-bind:style`一样的 API
+				  style: {
+				    color: 'red',
+				    fontSize: '14px'
+				  },
+				  // 正常的 HTML 特性
+				  attrs: {
+				    id: 'foo'
+				  },
+				  // 组件 props
+				  props: {
+				    myProp: 'bar'
+				  },
+				  // DOM 属性
+				  domProps: {
+				    innerHTML: 'baz'
+				  },
+				  // 事件监听器基于 "on"
+				  // 所以不再支持如 v-on:keyup.enter 修饰器
+				  // 需要手动匹配 keyCode。
+				  on: {
+				    click: this.clickHandler
+				  },
+				  // 仅对于组件，用于监听原生事件，而不是组件使用 vm.$emit 触发的事件。
+				  nativeOn: {
+				    click: this.nativeClickHandler
+				  },
+				  // 自定义指令. 注意事项：不能对绑定的旧值设值
+				  // Vue 会为您持续追踨
+				  directives: [
+				    {
+				      name: 'my-custom-directive',
+				      value: '2'
+				      expression: '1 + 1',
+				      arg: 'foo',
+				      modifiers: {
+				        bar: true
+				      }
+				    }
+				  ],
+				  // Scoped slots in the form of
+				  // { name: props => VNode | Array<VNode> }
+				  scopedSlots: {
+				    default: props => h('span', props.text)
+				  },
+				  // 如果子组件有定义 slot 的名称
+				  slot: 'name-of-slot'
+				  // 其他特殊顶层属性
+				  key: 'myKey',
+				  ref: 'myRef'
+				} -->
+
+				<!-- #完整示例 -->
+				<hr>
+				<!-- 重写上一个栗子 -->
+				<anchored-heading-render-total :level='4'>
+					完全用js渲染的<strong>hehhe</strong>
+				</anchored-heading-render-total>
+
+				<!-- #约束 -->
+				<!-- 所有组件树中的 VNodes 必须唯一，不能有相同的 -->
+				<repeat-vnodes></repeat-vnodes>
+
+
+		</div>
+
+		<div class="redB">
+			<h2>使用js代替模板功能</h2>
+			<!--#v-if and v-for  -->
+			<!-- Vue的render不提供专用的api，可以用原生js实现 -->
+			<ul v-if="items.length"> 
+				<li v-for="item in items">{{item}}</li>
+			</ul>
+			<p v-else>no items found</p>
+			<!-- 使用render -->
+
+			<v-if-v-for :items='items'></v-if-v-for>
+			<hr>
+			<!-- #v-model -->
+			<!-- 没有，需要自己写 -->
+			<v-model-control v-model='msg'></v-model-control>
+			<v-model-control :value='msg'></v-model-control>
+
+			<!-- #Event and Key Modifiers -->
+			<!-- 有些modifiers可在render函数找到对应前缀，
+				 .capture -> !	： '!click'
+				 .once ->  ~   :'~click'
+				 .capture.once or.once.capture : ~!
+				 其他事件修饰符，直接用原生js代替
+				 .stop -> event.stopPropagation()
+				 .prevent -> event.preventDefault()
+				 .self -> if(event.target!==event.currentTarget) return
+				 .enter .13 -> if(event.keyCode!===13) return
+				 .ctrl .alt.. -> if(!event.crtlKey) return
+			 -->
+
+			 <!-- #slots -->
+
+		</div>
+		<div class="redB">
+			<h2>JSX - BABEL转码 - 防止写很多render太恶心</h2>
+		</div>
+		<div class="redB">
+			<h2>函数化组件</h2>
+			<!-- 在这个例子中，我们标记组件为 functional， 这意味它是无状态（没有 data），无实例（没有 this 上下文）。
+一个 函数化组件 就像这样 -->
+            <smart-list :items='items'></smart-list>
+
+		</div>
+
+		
+
+	</div>
+
+</body>
+
+<script type='text/template' id="t1">
+  <div>
+    <h1 v-if="level === 1">
+      <slot></slot>
+    </h1>
+    <h2 v-if="level === 2">
+      <slot></slot>
+    </h2>
+    <h3 v-if="level === 3">
+      <slot></slot>
+    </h3>
+    <h4 v-if="level === 4">
+      <slot></slot>
+    </h4>
+    <h5 v-if="level === 5">
+      <slot></slot>
+    </h5>
+    <h6 v-if="level === 6">
+      <slot></slot>
+    </h6>
+  </div>
+</script>
+<script>
+var getChildrenTextContent = function(children){
+	return children.map(function(node){
+		return node.children?getChildrenTextContent(node.children):node.text;
+	}).join('');
+}
+
+	Vue.component('anchored-heading',{
+		template:'#t1',
+		props:['level']
+	})
+	Vue.component('anchored-heading-render',{
+		render(createElement){
+			return createElement('h'+this.level,this.$slots.default);
+			//子组件的阵列
+			//比如 anchored-heading 中的 Hello world!, 这些子元素被存储在组件实例中的 $slots.default中。如果你还不了解， 在深入 render 函数之前推荐阅读 instance properties API。
+		},
+		props:['level']
+	})
+	Vue.component('anchored-heading-render-total',{
+		render(createElement){
+			//create kebabCase id
+			console.log(this.$slots.default)
+			console.log(getChildrenTextContent(this.$slots.default))
+			var headingId = getChildrenTextContent(this.$slots.default)
+				.toLowerCase()
+				.replace(/\W+/g,'-')
+				.replace(/^\-|\-$/g,'');
+			return createElement(
+				'h'+this.level,
+				[
+					createElement('a',{
+						attrs:{name:headingId,href:'#'+headingId}
+					},this.$slots.default)
+				]
+			)	
+		},
+		props:['level']
+	})
+	// 约束：所有组件树的VNodes必须唯一,居然没有警告？？？？？？？？？
+	Vue.component('repeat-vnodes',{
+		render(createElement){
+			var myParagraphVNode = createElement('p','hi');
+			return createElement('div',[myParagraphVNode,myParagraphVNode,myParagraphVNode])
+		}
+	})
+	//安全的重复子nodes
+	Vue.component('repeat-vnodes-correct',{
+		render(createElement){
+			return createElement('div',Array.apply(null,{length:10}).map(()=>createElement('p','hi')));
+		}
+	})
+	Vue.component('v-if-v-for',{
+		render(createElement){
+			//使用if-else map重写 - 
+			if(this.items.length>0){
+				return createElement('ul',this.items.map((item)=>createElement('li',item)));
+			}else{
+				return createElement('p','no items found');
+			}
+		},
+		props:{
+			items:{type:Array,required:true}
+		}
+	})
+	Vue.component('v-model-control',{
+		render(createElement){
+			var self = this;
+			return createElement('input',{
+				domProps:{value:self.value},
+				on:{
+					input(event){
+						self.value = event.target.value;
+					}
+				}
+			})
+		},
+		props:['value'],
+
+	})
+	Vue.component('fn-c',{
+		functional:true,
+		//缺少实例提供第二个参数作为上下文
+		render(createElement,context){
+			//组件需要的一切都由context传递：
+				//props，children,slots,data,parent(对父组件的引用)
+			//functional为true后，this.$slots.default为context.children
+			//this.level->context.props.level	
+
+			//#slots() vs children
+			// slots().default 或者slots().foo获得具名子组件，而children返回所有子
+		},
+		//可选
+		props:{
+
+		}
+	})
+	//依赖传入props的值的smart-list组件
+	var EmptyList = { /* ... */ }
+	var TableList = { /* ... */ }
+	var OrderedList = { /* ... */ }
+	var UnorderedList = { /* ... */ }
+	Vue.component('smart-list',{
+		functional:true,
+		render(h,context){
+			function apporiateList(){
+				if(context.props.items.length==0){
+					return EmptyList;
+				}
+				if(typeof context.props.items[0] =='object'){
+					return TableList;
+				}
+				if(context.props.isOrdered){
+					return OrderedList;
+				}
+				return UnorderedList;
+
+			}
+			return h(
+					apporiateList,
+					context.data,
+					context.children
+				)
+		},
+		props:{
+			items:Array,
+			isOrdered:Boolean,
+		}
+	})
+	var app = new Vue({
+		el:'#app',
+		data:{
+			items:[1,2,3,4],
+			msg:"hello from parent"
+		}
+	})
+    
+    //#slots - access static slot contents as Array of Vnodes
+ //    render: function (createElement) {
+ //  // <div><slot></slot></div>
+ //  		return createElement('div', this.$slots.default)
+	// }
+	//#scoped slots - 父需用用代用scope特性的template元素来接受msg
+// 	render: function (createElement) {
+//   // <div><slot :text="msg"></slot></div>
+//   return createElement('div', [
+//     this.$scopedSlots.default({
+//       text: this.msg
+//     })
+//   ])
+// }
+
+// render (createElement) {
+//   return createElement('div', [
+//     createElement('child', {
+//       // pass scopedSlots in the data object
+//       // in the form of { name: props => VNode | Array<VNode> }
+//       scopedSlots: {
+//         default: function (props) {
+//           return createElement('span', props.text)
+//         }
+//       }
+//     })
+//   ])
+// }
+
+
+</script>
+</html>
