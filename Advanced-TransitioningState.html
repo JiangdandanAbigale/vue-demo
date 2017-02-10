@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - 过渡状态</title>
+</head>
+<style>
+	.redB{
+		margin-bottom:10px;
+		border:2px solid blue;
+	}
+	.color-preview{
+		display: inline-block;
+		width:50px;
+		height:50px;
+	}
+</style>
+<script src="https://unpkg.com/tween.js@16.3.4"></script>
+<script src="https://unpkg.com/color-js@1.0.3/color.js"></script>
+<script src="js/vue.js"></script>
+<body>
+	<div id="app">
+		<!-- 对于数据元素本身的动效，eg数字和运算，颜色的显示，svg节点位置，元素大小和其他属性.
+		所有的原始数字都被事先存储起来，可以直接转换到数字。做到这一步，我们就可以结合 Vue 的响应式和组件系统，使用第三方库来实现切换元素的过渡状态。 -->
+		<div class="redB">
+			<h2>状态动画与watcher</h2>
+			<!-- 通过 watcher 我们能监听到任何数值属性的数值更新。 -->
+			请输入数字<input type="number" v-model.number='num'>
+			<p>{{animatedNum}}</p>
+
+			<!-- 是对于不能直接像数字一样存储的值，比如 CSS 中的 color 的值，通过下面的例子我们来通过 Color.js 实现一个例子 -->
+			<br>
+			<input type="text" v-model='colorQuery' placeholder="enter a color" @keyup.enter='updateColor'>
+			<button @click='updateColor'>update</button>
+			<p>Preview:</p>
+			<span class="color-preview" :style="{background:tweenedCssColor}"></span>
+			<p>{{tweenedCssColor}}</p>
+
+		</div>
+
+		<div class="redB">
+			<h2>动态状态转化:eg svg</h2>
+			<!-- 不演示了 -->
+		</div>
+		<div class="redB">
+			<h2>通过组件组织过渡</h2>
+			<!-- 管理太多的状态转换的很快会接近到 Vue 实例或者组件的复杂性，幸好很多的动画可以提取到专用的子组件。 -->
+<!-- 我们来将之前的示例改写一下 -->
+			<input type="number" v-model.number='firstNum' step='25'>
+			+
+			<input type="number" v-model.number='secondNum' step='25'>
+			=
+			<span>{{result}}</span>
+			<p>
+				<animate-num :value='firstNum'></animate-num>
+				+
+				<animate-num :value='secondNum'></animate-num>
+				=
+				<animate-num :value='result'></animate-num>
+			</p>
+
+
+		</div>
+	</div>
+
+</body>
+<script>
+	Vue.component('animate-num',{
+		props:{
+			value:{type:Number,default:0}
+		},
+		data(){
+			return {tweeningNum:0};
+		},
+		template:'<span>{{tweeningNum}}</span>',
+		mounted(){
+			this.tween(0,this.value);
+		},
+		watch:{
+			value(newVal,oldVal){
+				this.tween(oldVal,newVal);
+			}
+		},
+		methods:{
+			tween(startVal,endVal){
+				var vm = this;
+				function animate(time){
+					requestAnimationFrame(animate)
+					TWEEN.update(time)
+				}
+				new TWEEN.Tween({tweeningNumber:startVal})
+					.easing(TWEEN.Easing.Quadratic.Out)
+					.to({tweeningNumber:endVal},1000)
+					.onUpdate(function(){
+						vm.tweeningNum = this.tweeningNumber.toFixed(0);
+					}).start();
+					animate();
+
+			}
+		}
+	})
+	var Color = net.brehaut.Color
+	var app = new Vue({
+		el:'#app',
+		data:{
+			num:0,
+			animatedNum:0,
+			colorQuery:'',
+			color:{red:0,green:0,blue:0,alpha:1},
+			tweenedColor:{},
+			firstNum:0,
+			secondNum:0,
+		},
+		created(){
+			this.tweenedColor = Object.assign({},this.color);
+		},
+		computed:{
+			tweenedCssColor(){
+				return new Color({
+					red:this.tweenedColor.red,
+					green:this.tweenedColor.green,
+					blue:this.tweenedColor.blue,
+					alpha:this.tweenedColor.alpha
+				}).toCSS();
+			},
+			result(){
+				return this.firstNum+this.secondNum;
+			}
+		},
+		watch:{
+			num(newVal,oldVal){
+				var vm = this;
+				function animate(time){
+					requestAnimationFrame(animate)
+					TWEEN.update(time)
+				}
+				new TWEEN.Tween({tweeningNumber:oldVal})
+					.easing(TWEEN.Easing.Quadratic.Out)
+					.to({tweeningNumber:newVal},500)
+					.onUpdate(function(){
+						vm.animatedNum = this.tweeningNumber.toFixed(0)
+					}).start();
+					animate();
+			},
+			color(){
+				function animate(time){
+					requestAnimationFrame(animate)
+					TWEEN.update(time)
+				}
+				new TWEEN.Tween(this.tweenedColor)
+				.to(this.color,750).start();
+				animate();
+			}
+
+		},
+		methods:{
+			updateColor(){
+				this.color = new Color(this.colorQuery).toRGB()
+      			this.colorQuery = ''
+			}
+		}
+	})
+
+</script>
+</html>
