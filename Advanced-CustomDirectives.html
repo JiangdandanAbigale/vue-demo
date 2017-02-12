@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - 自定义指令 </title>
+</head>
+<script src="js/vue.js"></script>
+<style>
+	.redB{
+		border:2px solid green;
+		margin-bottom:10px;
+	}
+</style>
+<body>
+	<div id="app">
+		<div class="redB">
+			<h2>简介</h2>
+			<!-- 有时候仍然需对纯dom元素进行底层操作 -->
+			<!-- 栗子：页面刷新自动获得焦点 -->
+			<p>
+				页面刷新自动获取焦点：
+				<input type="text" v-focus v-if='show'>
+				<input type="text" v-focus>
+			</p>
+		</div>
+
+		<div class="redB">
+			<h2>钩子函数</h2>
+			<!-- 指令定义函数： -->
+			<p>
+				bind: 只调用一次，指令第一次绑定到元素时调用，用这个钩子函数可以定义一个在绑定时执行一次的初始化动作。
+				inserted: 被绑定元素插入父节点时调用（父节点存在即可调用，不必存在于 document 中）。
+				update: 被绑定元素所在的模板更新时调用，而不论绑定值是否变化。通过比较更新前后的绑定值，可以忽略不必要的模板更新（详细的钩子函数参数见下）。
+				componentUpdated: 被绑定元素所在模板完成一次更新周期时调用。
+				unbind: 只调用一次， 指令与元素解绑时调用。
+			</p>
+		</div>
+
+		<div class="redB">
+			<h2>钩子函数参数</h2>
+			<p>
+				el:指令所绑定的元素，可直接操作dom; （除el外，其他只读）
+				binding:对象，包含：
+					name: 指令名，不含v-;
+					value:指令的绑定值 v-dir ='1+1',即2；
+					oldValue:指令绑定的前一个值，仅在update and componentUpdated中使用；
+					expression:绑定值的字符串形式，即‘1+1’；
+					arg:传给指令的参数 v-dir:foo，即foo
+					modifiers:一个包含修饰符的对象 v-dir.foo ->{foo:true}
+				vnode:Vue编译生成的虚拟节点；
+				oldVnode:上一个虚拟节点，仅在update/componnetUpdate钩子中可用；
+				若钩子间需共享数据，建议通过元素的dateset来进行	
+			</p>
+			<!-- 栗子 -->
+			<p v-demo:hello.a.b='msg'></p>
+		</div>
+
+		<div class="redB">
+			<h2>函数简写</h2>
+			<!--  -->
+			<p v-color-swatch='color'>hahha</p>
+		</div>
+
+		<div class="redB">
+			<h2>对象字面量</h2>
+			<!-- 若指令需要多个值 -->
+			<p v-demoobj={color:'green',fontSize:'20px'}>hhahhah</p>
+		</div>
+		
+	</div>
+
+
+</body>
+<script>
+    //全局注册指令 也可局部注册
+    Vue.directive('focus',{
+    	//当绑定元素绑入都DOM中。
+    	inserted(el){
+    		el.focus();
+    	}
+    })
+    Vue.directive('demo',{
+    	bind(el,binding,vnode){
+    		var s = JSON.stringify;
+    		el.innerHTML =
+    			'name: '+s(binding.name)+'<br>'+
+    			'value: '+s(binding.value)+'<br>'+
+    			'expression: '+s(binding.expression)+'<br>'+
+    			'argument: '+s(binding.arg)+'<br>'+
+    			'modifiers: '+s(binding.modifiers)+'<br>'+
+    			'vnode keys: '+Object.keys(vnode).join(",");
+    	}
+    })
+    // 函数简写：大多数情况只想在bind和update钩子上做重复动作，并不关心其他钩子
+    Vue.directive('color-swatch',function(el,binding){
+    	el.style.backgroundColor = binding.value;
+    })
+    //对象字面量
+    Vue.directive('demoobj',(el,binding)=>{
+    	el.style.color = binding.value.color;
+    	el.style.fontSize = binding.value.fontSize;
+    })
+	var app = new Vue({
+		el:'#app',
+		data:{
+			show:false,
+			msg:'hellocustomdirectives',
+			color:'#ccc',
+		}
+	})
+
+</script>
+</html>
