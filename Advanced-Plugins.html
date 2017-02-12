@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - 插件 </title>
+</head>
+<script src="js/vue.js"></script>
+<style>
+	.redb{
+		border:2px solid red;
+		margin-bottom:10px;
+	}
+</style>
+<body>
+	<div id="app">
+		<div class="redb">
+			<h2>开发插件</h2>
+			<p>
+				插件通常为Vue添加全局功能，一般为：
+				1.添加全局方法或者属性，如vue-element
+				2.添加全局资源：指令、过滤器、过渡等：vue-touch;
+				3.通过全局mixin方法添加一些逐渐选项，vuex;
+				4.添加vue实例方法，通过它们添加到Vue.prototype上实现；
+				5.一个库，提供api,同时提供上面1-n功能，vue-router
+			</p>
+		</div>
+		<div>
+			<h2>使用插件</h2>
+			<p>Vue.use()</p>
+		</div>
+	</div>
+
+</body>
+<script>
+	//开发插件
+	  // vue插件公开方法install-参数：vue构造器和可选对象
+	var MyPlugin='...';  
+	MyPlugin.install = function(Vue,options){
+		//方法1
+		Vue.myGlobalMethos = function(){
+
+		}
+		//方法2
+		Vue.directive('my-directive',{
+			bind(el,binding,vnode,oldVnode){
+
+			}
+		})
+		//方法3
+		Vue.mixin({
+			created(){
+
+			}
+		})
+		//方法4
+		Vue.prototype.$myMethod = function(options){
+
+		}	
+	}  
+	//使用插件
+	Vue.use(MyPlugin);
+	//可传入对象
+	Vue.use(MyPlugin,{someOpts:true});
+	var app = new Vue({
+		el:'#app',
+		data:{}
+	})
+
+</script>
+</html>
