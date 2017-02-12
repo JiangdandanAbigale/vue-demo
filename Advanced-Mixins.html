@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - 混合</title>
+</head>
+<script src="js/vue.js"></script>
+<style>
+	.redb{
+		border:2px solid green;
+		margin-bottom:10px;
+	}
+</style>
+<body>
+	<div id="app">
+		<div class="redb">
+			<h2>基础</h2>
+			<p>混合是一种灵活的分布式复用 Vue 组件的方式。混合对象可以包含任意组件选项。以组件使用混合对象时，所有混合对象的选项将被混入该组件本身的选项。</p>
+			<!--栗子 -->
+
+		
+		</div>
+
+		<div class="redb">
+			<h2>选项混合</h2>
+			<p>当组件和混合对象含有同名选项时，这些选项将以恰当的方式混合。比如，同名钩子函数将混合为一个数组，因此都将被调用。另外，混合对象的 钩子将在组件自身钩子 之前 调用</p>
+			<!-- 栗子 -->
+			<p>
+				值为对象的选项，例如 methods, components 和 directives，将被混合为同一个对象。 两个对象键名冲突时，取组件对象的键值对。
+			</p>
+			<p>Vue.extend() 也使用同样的策略进行合并。</p>
+
+		</div>
+
+		<div class="redb">
+			<h2>全局混合</h2>
+			<p>
+				也可以全局注册混合对象。 注意使用！ 一旦使用全局混合对象，将会影响到 所有 之后创建的 Vue 实例。使用恰当时，可以为自定义对象注入处理逻辑。
+			</p>
+
+		</div>
+
+		<div class="redb">
+			<h2>自定义选项混合策略</h2>
+			<!-- 略：觉得暂时用不到 -->
+		</div>
+	</div>
+
+</body>
+<script>
+ 	// 基础
+ 	// 定义一个混合对象
+var myMixin1 = {
+  created: function () {
+    this.hello()
+  },
+  methods: {
+    hello: function () {
+      console.log('hello from mixin!')
+    }
+  }
+}
+// 定义一个使用混合对象的组件
+var Component = Vue.extend({
+  mixins: [myMixin1]
+})
+var component = new Component() 
+
+// 选项合并
+var myMixin2 = {
+	created(){
+		console.log('from mixins')
+	},
+	methods:{
+		foo(){
+			console.log('foo from mixins')
+		},
+		conflict(){
+			console.log('conflict from mixins')
+		}
+	}
+}
+//全局
+Vue.mixin({
+	created(){
+		var myOpt = this.$options.myOpt;
+		if(myOpt){
+			console.log(myOpt);
+		}
+	}
+})
+var app = new Vue({
+	el:'#app',
+	data:{},
+	myOpt:'hello',
+	mixins:[myMixin2],
+	methods:{
+		bar(){
+			console.log('bar from component');
+		},
+		conflict(){
+			console.log('conflict from component');
+		}
+	},
+	created(){
+		console.log('from component')
+	}
+})
+
+</script>
+</html>
