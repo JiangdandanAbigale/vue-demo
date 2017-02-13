@@ -26,7 +26,7 @@
 		</div>
 		<div>
 			<h2>使用插件</h2>
-			<p>Vue.use()</p>
+			<p>Vue.use()会自动阻止注册相同插件多次，届时只会注册一次该插件。</p>
 		</div>
 	</div>
 
@@ -61,6 +61,7 @@
 	Vue.use(MyPlugin);
 	//可传入对象
 	Vue.use(MyPlugin,{someOpts:true});
+	
 	var app = new Vue({
 		el:'#app',
 		data:{}
