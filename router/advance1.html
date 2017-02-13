@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>进阶-导航钩子</title>
+</head>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<body>
+	<div id='app'>
+		<h1>导航钩子</h1>
+		<!--作用：拦截导航，完成跳转或取消；有全局的，单个路由独享的，或者组件级的  -->
+			</div>
+</body>
+<script>
+	// 1.全局钩子：使用router.beforeEach()注册的before钩子
+		  //当一个导航触发时，全局的before钩子按照顺序调用。
+	const router = new VueRouter({})
+	router.beforeEach((to,from,next)=>{
+		// to:即将进入的目标路由对象
+		// from:当前导航正要离开的路由
+		//next:函数，一定要调用该方法来resovle钩子。
+			// next():进行管道中的下一个钩子，若全部钩子执行完了，导航状态为confirmed
+			// next(false): 中断当前导航。若url改变了，url会重置到from路由对应的地址
+			// next('/'): 跳转到不同的地址。
+	})
+	// 全局after钩子，无next(),不改变导航
+	router.afterEach(route=>{
+
+	})
+	//2.某个路由独享的钩子
+	const router1 = new VueRouter({
+		  routes: [
+		    {
+		      path: '/foo',
+		      component: Foo,
+		      beforeEnter: (to, from, next) => {
+		        // ...
+		      }
+		    }
+		  ]
+	})
+	// 3.组件内的钩子
+	const Foo = {
+		template:'',
+		beforeRouteEnter(to,from,next){
+			//在渲染该组件的对应路由被confirm前调用
+			// 无法获得组件实例this
+			// 因为当钩子执行前，组件实例还未创建
+
+			// 但可以通过传回调给next()来访问组件实例
+			next(vm=>{
+				//通过vm访问组件实例
+			})
+		},
+		beforeRouteUpdate(to,from,next){
+			//在当前路由改变，但是该组件被复用时调用
+			// 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+		    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+		    // 可以访问组件实例 `this`
+		},
+		beforeRouteLeave(to,from,next){
+			//导航离开该组件的对应路由时调用
+			// 可访问组件实例this
+			// 这个 leave 钩子通常用来禁止用户在还未保存修改前突然离开。可以通过 next(false) 来取消导航。
+		}
+	}
+
+</script>
+</html>

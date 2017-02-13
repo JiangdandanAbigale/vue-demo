@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>进阶-数据获取</title>
+</head>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<body>
+	<div id='app'>
+		<h1>数据获取</h1>
+			<p>
+				导航完成之后获取：先完成导航，然后在接下来的组件生命周期钩子中获取数据。在数据获取期间显示『加载中』之类的指示。
+				导航完成之前获取：导航完成前，在路由的 enter 钩子中获取数据，在数据获取成功后执行导航。
+				（实际例子中可实践）
+			</p>
+		<h2>滚动行为</h2>
+		<h2>懒加载</h2>
+			
+
+		</div>
+</body>
+<script>
+
+const router = new VueRouter({
+  routes: [...],
+  scrollBehavior (to, from, savedPosition) {
+    // return 期望滚动到哪个的位置
+  }
+})
+
+	
+
+</script>
+</html>

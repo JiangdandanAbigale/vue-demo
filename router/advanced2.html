@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>进阶-路由元信息</title>
+</head>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<body>
+	<div id='app'>
+		<h1>路由元信息</h1>
+		<router-link to='/foo'>go to foo</router-link>
+		<router-view></router-view>
+	
+	</div>
+</body>
+<script>
+    const Foo={
+    	template:`
+			<div>
+				this is foo
+				<br>
+				<router-link to='/foo/bar'>go to bar</router-link>
+				<router-view></router-view>
+			</div>
+    	`
+    };
+    const Bar ={
+    	template:`
+			<div>this is a bar</div>
+    	`
+    }	
+
+	// 定义路由时可配置meta字段
+	const router = new VueRouter({
+		routes:[
+			{
+				path:'/foo',
+				component:Foo,
+				children:[
+					{
+						path:'bar',
+						component:Bar,
+						//a meta filed,
+						meta:{requiresAuth:true}
+					}
+				]
+			}
+		]
+	})
+	//如何访问meta字段？一个路由匹配到的所有路由记录会暴露为 $route 对象（还有在导航钩子中的 route 对象）的 $route.matched 数组。因此，我们需要遍历 $route.matched 来检查路由记录中的 meta 字段。
+    router.beforeEach((to,from,next)=>{
+    	if(to.matched.some(record=>record.meta.requiresAuth)){
+    		// this route requires auth, check if logged in
+    // if not, redirect to login page.
+    		if(!auth.loggedIn()){
+    			next({
+    				path:'/login',
+    				query:{redirect:to.fullPath}
+    			})
+    		}else{
+    			next()
+    		}
+    	}else{
+    		next()
+    	}
+    })
+
+	const vm = new Vue({
+		router
+	}).$mount('#app');
+</script>
+</html>
