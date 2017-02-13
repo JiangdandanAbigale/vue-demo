@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>基础-动态路由匹配</title>
+</head>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<body>
+	<div id='app'>
+		<h1>动态路由匹配</h1>
+		<!-- 需把某种模式匹配到的所有路由，全都映射到同一个组件，需要【动态路径参数】 -->
+		<p>
+			<router-link to='/user/233'>to 233</router-link>
+			<router-link to='/user/456'>to 456</router-link>
+		</p>
+		<router-view></router-view>
+	</div>
+</body>
+<script>
+	const User = {
+		template:'<div>{{$route.params.id}}</div>',
+		watch:{
+			'$route'(to,from){
+				// 当使用路由参数时，例如从 /user/foo 导航到 user/bar，原来的组件实例会被复用。因为两个路由都渲染同个组件，比起销毁再创建，复用则显得更加高效。不过，这也意味着组件的生命周期钩子不会再被调用。
+
+				// 复用组件时，想对路由参数的变化作出响应的话，你可以简单地 watch（监测变化） $route 对象：
+			}
+		}
+};
+	const router = new VueRouter({
+		routes:[
+			// 动态路径参数，以冒号开头,参数值会被设置到this.$route.params
+			// $route 对象还提供了其它有用的信息，例如，$route.query（如果 URL 中有查询参数）、$route.hash 等等
+			{path:'/user/:id',component:User}
+		]
+	})
+	// const app = new Vue({
+	// 	el:'#app',
+	// 	router
+	// })
+
+
+	const app = new Vue({
+		router
+	}).$mount('#app');
+
+	//同一个路径可以匹配多个路由，此时，匹配的优先级就按照路由的定义顺序：谁先定义的，谁的优先级就最高。
+</script>
+</html>

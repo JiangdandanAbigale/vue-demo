@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>基础-编程式导航</title>
+</head>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<body>
+<div id='app'>
+	<h1>编程式的导航:copy window.history</h1>
+	<p>router.push(location)</p>
+	<!-- 借助router实例方法:router.push(location),该方法会向history栈添加一个新的记录。
+	点击router-link（声明式）时，该方法在其内部调用 -->
+	<p>router.replace(location)</p>
+	<!-- 它不会向 history 添加新记录 -->
+	<!-- 相当于<router-link to=',,' replace> -->
+	<p>router.go(n)</p>
+	<!-- 在 history 记录中向前或者后退多少步 -->
+
+	
+</div>
+	
+</body>
+<script>
+	// router.push()参数：字符串路径或描述地址的对象
+	// router.push('home')-字符串
+	// router.push({path:"home"})-对象
+	// router.push({name:'user',params:{userId:123}}) - 命名路由
+	// router.push({path:'register',query:{plan:'private'}})-带查询参数/register?plan=private
+
+</script>
+</html>
