@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Adanced - 状态管理</title>
+</head>
+<script src="js/vue.js"></script>
+<script src="https://unpkg.com/vuex"></script>
+
+<body>
+	<div id="app">
+		<!-- Vuex和单纯的全局对象区别：
+			1.Vuex的状态存储是响应式的。2.无法直接改变store中的状态，除了显式地提交mutations
+		 -->
+	</div>
+
+</body>
+<script>
+const moduleA = {
+  state: { ... },
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
+
+const moduleB = {
+  state: { ... },
+  mutations: { ... },
+  actions: { ... }
+}
+
+	// var app = new Vue({
+	// 	el:'#app',
+	// 	// state:驱动应用的数据源；
+	// 	data:{
+	// 		return{
+	// 			count:0
+	// 		}
+	// 	}
+	// 	// view,以声明方式将state映射到视图
+	// 	template:`
+	// 		<div>{{count}}</div>
+	// 	`,
+	// 	// actions，响应在view上的用户输入导致的状态变化
+	// 	methods{
+	// 		increment(){
+	// 			this.count++;
+	// 		}
+	// 	}
+	// })
+
+
+	// 创建一个store,仅需提供初始state对象和一些mutations
+	const store = new Vuex.Store({
+		state:{
+			count:0,
+			todos:[
+				{id:1,text:'..',done:true},
+				{id:1,text:'..',done:false},
+
+			]
+		},
+		mutations:{
+			increment(state){ //increment事件类型 
+				state.count++
+			},
+			increment1(state,n){
+				//在大多数情况下，载荷应该是一个对象，这样可以包含多个字段并且记录的 mutation 会更易读：
+				state.count+=n;
+			}
+		},
+		// Getters 如果有多个组件需要用到此属性，我们要么复制这个函数，或者抽取到一个共享函数然后在多处导入它,
+		//Vuex 允许我们在 store 中定义『getters』（可以认为是 store 的计算属性）。Getters 接受 state 作为其第一个参数：
+		//Getters 也可以接受其他 getters 作为第二个参数：
+		getters:{
+			doneTodos:state=>{
+				return state.todos.filter(todo => todo.done)
+			}
+		},
+		actions:{
+			// increment(context){//context对象
+			// 	context.commit('increment');
+			// }
+			increment({commit}){
+				commit('increment');
+			}
+		},
+		modules:{
+			a:moduleA,
+			b:moduleB
+		}
+	})
+	// 通过store.state获取状态对象，通过store.commit方法触发状态变更
+	store.commit('increment');//唤醒一个 mutation handler，你需要以相应的 type 调用 store.commit 方法：
+	console.log(store.state.count);
+	// 你可以向 store.commit 传入额外的参数，即 mutation 的 载荷（payload）：
+	store.commit('increment1',10)
+	console.log(store.state.count)
+
+	// store.commit('increment1',{amount:10})
+	// 对象提交风格
+	// store.commit({type:'increment',amount:10})
+	//使用常量替代 mutation 事件类型,mutation必须是同步函数
+	//你可以在组件中使用 this.$store.commit('xxx') 提交 mutation 或者用mapMutations()
+
+	//核心概念-state:
+		//Vuex使用单一状态树 - means 每个应用仅仅包含一个store实例
+		// 在Vue组件中获取Vuex状态- 最简单方法：从计算属性中返回某个状态
+	//Action通过store.dispatch触发
+	// store.dispatch('increment') ,Actions 支持同样的载荷方式和对象方式进行分发：
+
+	const Counter = {
+		template:`<div>{{ count }}</div>`,
+		computed:{
+			count(){
+				// 缺点：导致组件依赖的全局状态单栗。在模块化的构建系统中，在每个需要使用 state 的组件中需要频繁地导入，并且在测试组件时需要模拟状态。
+				// return store.state.count
+
+				// 且子组件能通过 this.$store 访问到
+				return this.$store.state.count
+			},
+			 doneTodosCount () {
+    			return this.$store.getters.doneTodosCount
+ 			 }
+		}
+	}
+		//uex 通过 store 选项，提供了一种机制将状态从根组件『注入』到每一个子组件中（需调用 Vue.use(Vuex)）：
+	const app = new Vue({
+		el:'#app',
+		// 把 store 对象提供给 “store” 选项，这可以把 store 的实例注入所有的子组件
+		store,
+		components:{ Counter },
+		template:`
+			<div class='app'>
+				<counter></counter>
+			</div>
+		`
+	})	
+	//当一个组件需要获取多个状态时候，将这些状态都声明为计算属性会有些重复和冗余。为了解决这个问题，我们可以使用 mapState 辅助函数帮助我们生成计算属性，让你少按几次键：
+Vuex.mapState({
+			count:state=>state.count,
+			// 传字符串参数 'count' 等同于 `state => state.count`
+			countAlias: 'count',
+			// 为了能够使用 `this` 获取局部状态，必须使用常规函数
+			countPlusLocalState(state){
+				return state.count + this.localCount
+			}
+})
+// getter会暴露
+console.log(store.getters.doneTodos);
+// mapGetters()
+
+//mutations
+// 每个 mutation 都有一个字符串的 事件类型 (type) 和 一个 回调函数 (handler)。这个回调函数就是我们实际进行状态更改的地方，并且它会接受 state 作为第一个参数：
+
+//actions:提交的是mutations不直接改状态；可包含任意异步操作
+// ，Vuex 允许我们将 store 分割到模块（module）。每个模块拥有自己的 state、mutation、action、getters、甚至是嵌套子模块——从上至下进行类似的分割：
+
+//同样，对于模块内部的 action，context.state 是局部状态，根节点的状态是 context.rootState:
+//对于模块内部的 getter，根节点状态会作为第三个参数：
+
+</script>
+</html>
